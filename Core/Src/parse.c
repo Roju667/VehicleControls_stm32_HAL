@@ -18,7 +18,7 @@
 /*
  * @ function parse message and start command procedures
  */
-uint8_t Parser_Parse(uint8_t *ParseBuffer, uint16_t ServoX,uint16_t ServoY)
+uint8_t Parser_Parse(uint8_t *ParseBuffer, uint16_t *ServoX, uint16_t *ServoY)
 {
 	uint8_t *ParsePointer;
 
@@ -27,10 +27,10 @@ uint8_t Parser_Parse(uint8_t *ParseBuffer, uint16_t ServoX,uint16_t ServoY)
 	if(strcmp((char*)ParsePointer,"ACK") == 0)
 	{
 		ParsePointer = (uint8_t*)(strtok(NULL, ";"));
-		ServoX = atoi((const char *)ParsePointer);
+		*ServoX = atoi((const char*) ParsePointer);
 
 		ParsePointer = (uint8_t*)(strtok(NULL, ";"));
-		ServoY = atoi((const char *)ParsePointer);
+		*ServoY = atoi((const char*) ParsePointer);
 	}
 
 	return 0;
