@@ -20,12 +20,15 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "JDY-09.h"
+#include "stdio.h"
+#include "parse.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +50,7 @@
 /* USER CODE BEGIN PV */
 JDY09_t JDY09_1;
 uint8_t TransferBuffer[64];
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,11 +95,20 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART1_UART_Init();
+  MX_TIM1_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-	JDY09_Init(&JDY09_1, &huart1);
+  JDY09_Init(&JDY09_1, &huart1);
+
+  uint8_t AckMsg[8];
+  uint8_t len;
+  uint16_t NewServoX, NewServoY;
+  uint16_t LastServoX,LastServoY;
+  len = sprintf((char*)AckMsg,"OKAY\n");
+
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -109,7 +122,21 @@ int main(void)
 			//clear pending flag
 			JDY09_ClearMsgPendingFlag(&JDY09_1);
 
+			HAL_UART_Transmit(&huart1, AckMsg, len, 1000);
+
+			Parser_Parse(TransferBuffer, NewServoX, NewServoY);
+
+			if(abs(NewServoX - LastServoX) > 5 )
+			{
+				__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1, (NewServoX * 10));
+			}
+
+			LastServoX = NewServoX;
+
+			JDY09_StartNewIRQRx(&JDY09_1);
+
 		}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
