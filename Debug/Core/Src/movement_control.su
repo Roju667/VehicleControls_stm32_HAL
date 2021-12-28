@@ -1,0 +1,4 @@
+movement_control.c:22:6:Motor_Control	16	static
+movement_control.c:69:6:Motor_Init	24	static
+movement_control.c:87:6:Servo_Control	16	static
+movement_control.c:108:6:Servo_Init	24	static

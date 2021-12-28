@@ -1,0 +1,2 @@
+motor_control.c:22:6:Motor_Control	16	static
+motor_control.c:69:6:Motor_Init	24	static

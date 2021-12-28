@@ -6,10 +6,10 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Core/Src/JDY-09.c \
-../Core/Src/L298N.c \
 ../Core/Src/dma.c \
 ../Core/Src/gpio.c \
 ../Core/Src/main.c \
+../Core/Src/movement_control.c \
 ../Core/Src/parse.c \
 ../Core/Src/ringbuffer.c \
 ../Core/Src/stm32f1xx_hal_msp.c \
@@ -22,10 +22,10 @@ C_SRCS += \
 
 OBJS += \
 ./Core/Src/JDY-09.o \
-./Core/Src/L298N.o \
 ./Core/Src/dma.o \
 ./Core/Src/gpio.o \
 ./Core/Src/main.o \
+./Core/Src/movement_control.o \
 ./Core/Src/parse.o \
 ./Core/Src/ringbuffer.o \
 ./Core/Src/stm32f1xx_hal_msp.o \
@@ -38,10 +38,10 @@ OBJS += \
 
 C_DEPS += \
 ./Core/Src/JDY-09.d \
-./Core/Src/L298N.d \
 ./Core/Src/dma.d \
 ./Core/Src/gpio.d \
 ./Core/Src/main.d \
+./Core/Src/movement_control.d \
 ./Core/Src/parse.d \
 ./Core/Src/ringbuffer.d \
 ./Core/Src/stm32f1xx_hal_msp.d \

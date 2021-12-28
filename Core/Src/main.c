@@ -18,6 +18,7 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include "movement_control.h"
 #include "main.h"
 #include "dma.h"
 #include "tim.h"
@@ -30,7 +31,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "parse.h"
-#include "L298N.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,22 +44,15 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define	SERVO_PWM_COUNTERPERIOD 40000
-#define SERVO_LOW_LIMIT 	SERVO_PWM_COUNTERPERIOD / 40
-#define SERVO_HIGH_LIMIT	SERVO_PWM_COUNTERPERIOD / 8
-#define SERVO_RESOLUTION_1DEGREE (SERVO_HIGH_LIMIT - SERVO_LOW_LIMIT) / 180
-#define	MOTOR_PWM_COUNTERPERIOD 40000
-#define MOTOR_LOW_LIMIT 	0
-#define MOTOR_HIGH_LIMIT	MOTOR_PWM_COUNTERPERIOD
-#define MOTOR_RESOLUTION_1PERCENT MOTOR_PWM_COUNTERPERIOD / 100
-#define MOTOR_DEADBAND_LOW_LIMIT 18000
-#define MOTOR_DEADBAND_HIGH_LIMIT 22000
+
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
 JDY09_t JDY09_1;
+Motor_t Motor_1;
+Servo_t Servo_1;
 uint8_t TransferBuffer[64];
 
 /* USER CODE END PV */
@@ -112,16 +105,13 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   JDY09_Init(&JDY09_1, &huart1);
+  Motor_Init(&Motor_1, &htim1, TIM_CHANNEL_2);
+  Servo_Init(&Servo_1, &htim1, TIM_CHANNEL_1);
 
   uint8_t AckMsg[8];
-	uint8_t Len;
-	uint16_t NewServoX, NewMotorY;
-	uint16_t LastServoX = 0, LastMotorY = 0;
-	uint16_t MotorSpeed;
-	Len = sprintf((char*) AckMsg, "OKAY\n");
+  uint8_t Len;
+  Len = sprintf((char*) AckMsg, "OKAY\n");
 
-  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
-	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,43 +125,19 @@ int main(void)
 			//clear pending flag
 			JDY09_ClearMsgPendingFlag(&JDY09_1);
 
+			// fetch data from command message
+			Parser_Parse(TransferBuffer, &Servo_1.PWMCommandNew, &Motor_1.PWMCommandNew);
+
+			// control servo
+			Servo_Control(&Servo_1);
+
+			// control motor
+			Motor_Control(&Motor_1);
+
+			// send acknowledge message
 			HAL_UART_Transmit(&huart1, AckMsg, Len, 1000);
-
-			Parser_Parse(TransferBuffer, &NewServoX, &NewMotorY);
-
-			// move only when value changes by 1 degree
-			if (abs(NewServoX - LastServoX) > SERVO_RESOLUTION_1DEGREE)
-			{
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, NewServoX);
-			}
-
-			if (NewMotorY < MOTOR_DEADBAND_LOW_LIMIT)
-			{
-				LN298N_MOTOR_BACKWARD();
-				MotorSpeed = NewMotorY + MOTOR_DEADBAND_LOW_LIMIT;
-			}
-			else
-			{
-			LN298N_MOTOR_FORWARD();
-			MotorSpeed = NewMotorY;
-			}
-
-			if (NewMotorY > MOTOR_DEADBAND_LOW_LIMIT
-					&& NewMotorY < MOTOR_DEADBAND_HIGH_LIMIT)
-			{
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, 0);
-				LN298N_MOTOR_OFF();
-			}
-			// move only when value changes by 1 %
-			else if (abs(NewMotorY - LastMotorY) > MOTOR_RESOLUTION_1PERCENT)
-			{
-				__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, MotorSpeed);
-			}
-
-			LastMotorY = NewMotorY;
-			LastServoX = NewServoX;
 			
-
+			// start new IRQ
 			JDY09_StartNewIRQRx(&JDY09_1);
 
 		}
@@ -238,7 +204,6 @@ static void MX_NVIC_Init(void)
 #if (JDY09_UART_RX_IT == 1)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-
 	// Callback from BT module
 	JDY09_RxCpltCallbackIT(&JDY09_1, huart);
 }
