@@ -1022,7 +1022,7 @@ void Motor_Init (Motor_t* Motor, TIM_HandleTypeDef* PWMTimer, uint8_t PWMTimerCh
 
 0800067a <Servo_Control>:
  *
- * @param[*Motor] - handler of Motor struct
+ * @param[*Servo] - handler of Motor struct
  * @return - void
  */
 void Servo_Control (Servo_t *Servo)
