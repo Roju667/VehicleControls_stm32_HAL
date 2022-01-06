@@ -10,7 +10,7 @@ Modules that i used :
 - JDY-09/JDY-31 bluetooth module for recieving data
 - Okystar SG-90 micro-servo for direction control
 - L298N motor controller for speed control 
-- Motor that was already in a car
+- Motor that was already in a car  
 Other stuff that i used:
 - 4x 1.5V Battery
 - 3x LED
