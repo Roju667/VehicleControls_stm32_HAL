@@ -1,6 +1,6 @@
 # VehicleControls_stm32_HAL
 
-During playing with bluetooth module i decided to refresh toy car from 20 years ago. It is my first project that i programmed and built.
+During playing with bluetooth module i decided to refresh toy car from 20 years ago. It is my first project that i programmed/drew and built.
 It took me for sure too much time so i am writing this readme to close this chapter and move forward.
 
 I programmed it using HAL library by STM32.
