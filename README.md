@@ -19,3 +19,8 @@ Other stuff that i used:
 I built controller that you can find here : https://github.com/Roju667/VehicleJoystick_stm32_HAL
 
 ![alt text](https://github.com/Roju667/VehicleControls_stm32_HAL/blob/main/Schematic_Vehicle%20controls_2022-01-06.png?raw=true)
+
+Too much time spent soldering and connecting - but its my first time, so i am proud anyway.  
+
+![alt text](https://github.com/Roju667/VehicleControls_stm32_HAL/blob/main/IMG_6698.JPG?raw=true)
+
