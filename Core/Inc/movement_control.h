@@ -23,6 +23,18 @@
 #define DIR1_PIN					GPIO_PIN_10
 #define DIR2_PIN					GPIO_PIN_11
 
+//LED GPIOs
+
+#define LED_COMM_GPIO_PORT			GPIOA
+#define LED_FRONT1_GPIO_PORT		GPIOA
+#define LED_FRONT2_GPIO_PORT		GPIOA
+#define LED_COMM_PIN				GPIO_PIN_5
+#define LED_FRONT1_PIN				GPIO_PIN_6
+#define LED_FRONT2_PIN				GPIO_PIN_7
+#define LED_COMM_OFFSET				0
+#define LED_FRONT1_OFFSET			1
+#define LED_FRONT2_OFFSET			2
+
 // SERVO defines
 #define	SERVO_PWM_COUNTERPERIOD 	40000								// has to be 50 Hz (20ms) - (0,5ms = 0 degree) - (2,5ms = 180 degree)
 #define SERVO_LOW_LIMIT_DEGREES		60									// lowest position for servo
@@ -50,6 +62,8 @@ typedef struct Motor
 
 	uint8_t PWMTimerChannel;		// timer channel for PWM
 
+	uint8_t ControlOn;				// on/off
+
 }Motor_t;
 
 // Servo struct
@@ -63,12 +77,22 @@ typedef struct Servo
 
 	uint8_t PWMTimerChannel;		// timer channel for PWM
 
+	uint8_t ContorlOn;				// on/off
+
 }Servo_t;
+
+typedef struct VehicleLED
+{
+	uint8_t ControlWord;			// control bits for LEDs
+
+} VehicleLED_t;
 
 // functions
 void Motor_Control (Motor_t *Motor);
 void Motor_Init (Motor_t* Motor, TIM_HandleTypeDef* PWMTimer, uint8_t PWMTimerChannel);
 void Servo_Control (Servo_t *Servo);
 void Servo_Init (Servo_t *Servo, TIM_HandleTypeDef* PWMTimer, uint8_t PWMTimerChannel);
+void LED_Control(VehicleLED_t *VehicleLED);
+void Vehicle_Shutdown(VehicleLED_t *VehicleLED, Servo_t *Servo, Motor_t *Motor);
 
 #endif /* INC_MOVEMENT_CONTROL_H_ */

@@ -18,7 +18,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include "movement_control.h"
 #include "main.h"
 #include "dma.h"
 #include "tim.h"
@@ -30,7 +29,9 @@
 #include "JDY-09.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "movement_control.h"
 #include "parse.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,7 +54,10 @@
 JDY09_t JDY09_1;
 Motor_t Motor_1;
 Servo_t Servo_1;
+VehicleLED_t ControlLED;
+uint8_t MotorOn;
 uint8_t TransferBuffer[64];
+uint32_t LastMsgTimer = 0;
 
 /* USER CODE END PV */
 
@@ -126,7 +130,7 @@ int main(void)
 			JDY09_ClearMsgPendingFlag(&JDY09_1);
 
 			// fetch data from command message
-			Parser_Parse(TransferBuffer, &Servo_1.PWMCommandNew, &Motor_1.PWMCommandNew);
+			Parser_Parse(TransferBuffer, &Servo_1, &Motor_1, &ControlLED);
 
 			// control servo
 			Servo_Control(&Servo_1);
@@ -134,12 +138,24 @@ int main(void)
 			// control motor
 			Motor_Control(&Motor_1);
 
+			// control LEDs
+			LED_Control(&ControlLED);
+
+			// feed communcation timer
+			LastMsgTimer = HAL_GetTick();
+
 			// send acknowledge message
 			HAL_UART_Transmit(&huart1, AckMsg, Len, 1000);
 			
 			// start new IRQ
 			JDY09_StartNewIRQRx(&JDY09_1);
 
+		}
+
+		//if there was no message for 3 seconds, shut down motors and LEDs
+		if ((HAL_GetTick() - LastMsgTimer) > 3000)
+		{
+			Vehicle_Shutdown(&ControlLED, &Servo_1, &Motor_1);
 		}
 
     /* USER CODE END WHILE */
