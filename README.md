@@ -22,5 +22,7 @@ I built controller that you can find here : https://github.com/Roju667/VehicleJo
 
 Too much time spent soldering and connecting - but its my first time, so i am proud anyway.  
 
+![alt text](https://github.com/Roju667/VehicleControls_stm32_HAL/blob/main/cargif.gif)  
+
 ![alt text](https://github.com/Roju667/VehicleControls_stm32_HAL/blob/main/IMG_6698.JPG?raw=true)
 
